@@ -1,0 +1,45 @@
+/*body{*/
+/*!*background-color: darkblue;*!*/
+/*!*color: white;*!*/
+/*padding: 20px;*/
+/*}*/
+
+/*#form-id{*/
+/*margin-top: 100px;*/
+/*}*/
+
+/*#btn_sample{*/
+/*padding: 5px;*/
+/*border: none;*/
+
+/*}*/
+@import url("https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css");
+
+.fade-scale {
+    transform: scale(0);
+    opacity: 0;
+    -webkit-transition: all .25s linear;
+    -o-transition: all .25s linear;
+    transition: all .60s linear;
+}
+
+.fade-scale.in {
+    opacity: 1;
+    transform: scale(1);
+}
+.modal-header{
+    background-color: #337ab7;
+    color: antiquewhite;
+    font-size: large;
+}
+
+.form-group .control-label:after {
+    content:"*";
+    color:red;
+}
+
+
+#myModal .modal-body p{
+    color: black;
+    font-weight: bold;
+}

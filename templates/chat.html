@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <base target="_blank" />
+  <title>ERA ChatBOT</title>
+  <script src="//code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.0/jquery.timeago.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+  <script src="../static/js/jquery.confirm.js"></script>
+  <!--script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script-->
+  <!--script src="static/utf8.js"></script> -->
+  <script type=text/javascript>
+
+
+      $(document).ready(function () {
+
+
+          var idle_flag=0;
+          var matching_flag=0;
+          var idleTime = 31;
+          var timer=0;
+          var idleInterval;
+          var bangla_flag=0;
+          var rad_arr = [];
+          var match;
+          var no_match_flag=0;
+          var d;
+          var x;
+          var full;
+          var resp;
+          var resp1;
+          var param=[];
+          var param1=[];
+          var markkup_rad=[];
+
+          var channel = "/chat";
+          var socket = io.connect('http://' + document.domain + ':' + location.port + channel);
+
+          //Increment the idle time counter every minute.
+          console.log("Timer Starts....");
+
+
+
+
+
+
+
+
+
+          function formatDate(date, format, utc) {
+              var MMMM = ["\x00", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+              var MMM = ["\x01", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+              var dddd = ["\x02", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+              var ddd = ["\x03", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+              function ii(i, len) {
+                  var s = i + "";
+                  len = len || 2;
+                  while (s.length < len) s = "0" + s;
+                  return s;
+              }
+
+              var y = utc ? date.getUTCFullYear() : date.getFullYear();
+              format = format.replace(/(^|[^\\])yyyy+/g, "$1" + y);
+              format = format.replace(/(^|[^\\])yy/g, "$1" + y.toString().substr(2, 2));
+              format = format.replace(/(^|[^\\])y/g, "$1" + y);
+
+              var M = (utc ? date.getUTCMonth() : date.getMonth()) + 1;
+              format = format.replace(/(^|[^\\])MMMM+/g, "$1" + MMMM[0]);
+              format = format.replace(/(^|[^\\])MMM/g, "$1" + MMM[0]);
+              format = format.replace(/(^|[^\\])MM/g, "$1" + ii(M));
+              format = format.replace(/(^|[^\\])M/g, "$1" + M);
+
+              var d = utc ? date.getUTCDate() : date.getDate();
+              format = format.replace(/(^|[^\\])dddd+/g, "$1" + dddd[0]);
+              format = format.replace(/(^|[^\\])ddd/g, "$1" + ddd[0]);
+              format = format.replace(/(^|[^\\])dd/g, "$1" + ii(d));
+              format = format.replace(/(^|[^\\])d/g, "$1" + d);
+
+              var H = utc ? date.getUTCHours() : date.getHours();
+              format = format.replace(/(^|[^\\])HH+/g, "$1" + ii(H));
+              format = format.replace(/(^|[^\\])H/g, "$1" + H);
+
+              var h = H > 12 ? H - 12 : H == 0 ? 12 : H;
+              format = format.replace(/(^|[^\\])hh+/g, "$1" + ii(h));
+              format = format.replace(/(^|[^\\])h/g, "$1" + h);
+
+              var m = utc ? date.getUTCMinutes() : date.getMinutes();
+              format = format.replace(/(^|[^\\])mm+/g, "$1" + ii(m));
+              format = format.replace(/(^|[^\\])m/g, "$1" + m);
+
+              var s = utc ? date.getUTCSeconds() : date.getSeconds();
+              format = format.replace(/(^|[^\\])ss+/g, "$1" + ii(s));
+              format = format.replace(/(^|[^\\])s/g, "$1" + s);
+
+              var f = utc ? date.getUTCMilliseconds() : date.getMilliseconds();
+              format = format.replace(/(^|[^\\])fff+/g, "$1" + ii(f, 3));
+              f = Math.round(f / 10);
+              format = format.replace(/(^|[^\\])ff/g, "$1" + ii(f));
+              f = Math.round(f / 10);
+              format = format.replace(/(^|[^\\])f/g, "$1" + f);
+
+              var T = H < 12 ? "AM" : "PM";
+              format = format.replace(/(^|[^\\])TT+/g, "$1" + T);
+              format = format.replace(/(^|[^\\])T/g, "$1" + T.charAt(0));
+
+              var t = T.toLowerCase();
+              format = format.replace(/(^|[^\\])tt+/g, "$1" + t);
+              format = format.replace(/(^|[^\\])t/g, "$1" + t.charAt(0));
+
+              var tz = -date.getTimezoneOffset();
+              var K = utc || !tz ? "Z" : tz > 0 ? "+" : "-";
+              if (!utc) {
+                  tz = Math.abs(tz);
+                  var tzHrs = Math.floor(tz / 60);
+                  var tzMin = tz % 60;
+                  K += ii(tzHrs) + ":" + ii(tzMin);
+              }
+              format = format.replace(/(^|[^\\])K/g, "$1" + K);
+
+              var day = (utc ? date.getUTCDay() : date.getDay()) + 1;
+              format = format.replace(new RegExp(dddd[0], "g"), dddd[day]);
+              format = format.replace(new RegExp(ddd[0], "g"), ddd[day]);
+
+              format = format.replace(new RegExp(MMMM[0], "g"), MMMM[M]);
+              format = format.replace(new RegExp(MMM[0], "g"), MMM[M]);
+
+              format = format.replace(/\\(.)/g, "$1");
+
+              return format;
+          }
+
+
+
+          function timerIncrement() {
+
+
+              //return;
+              //console.log("timer-",timer);
+              //timer++;
+
+
+              idleTime = idleTime - 1;
+              //idle_flag=1;
+              //console.log(" Timer: ",idleTime);
+
+              if(idleTime>=0)
+                  document.getElementById("displayDiv").innerHTML = " <strong>  Timer: " + idleTime+" </strong>";
+
+              var username = $.cookie("realtime-chat-nickname");
+              var author=username;
+              var mobile_no=$.cookie("mobile_number");
+              var session=$.cookie("session_id");
+
+              // Tasnuva
+
+              if (idleTime < 0) { // 20 minutes
+
+                  resp="not answered";
+
+                  socket.emit('response', { data: { message: resp, author: author, Session: session, mobile_no: mobile_no, time:x } });
+                  socket.emit('transcript_bot', { data: { message: resp, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+                // Tasnuva
+
+                  setTimeout(function(){
+
+                      // $("#tblconv").append(markup2);
+                      var div = $('#tbldiv');
+                      div.animate({scrollTop: 500000}, 50);
+                      $("#messageText").val("");
+
+
+                  }, 3000);
+
+
+                  setTimeout(extra_interval, 10000);
+
+                  function extra_interval(){
+                      //window.location="/";
+                  }
+              }
+
+              else if(idleTime == 900){
+
+                  // d = new Date();
+                  // full=formatDate(d, "d MMM yyyy");
+                  // x = formatDate(d, "dddd h:mmtt");
+
+
+                  // var markup_bot=  "<tr><td class='text-right botresponsecssmaya'><img src='static/maya2.png' alt='Avatar' class='avatar'><small class='text-muted'>e-Recruitment "+x+"</small></td></tr>";
+
+                  // if(bangla_flag==1)
+                  //     resp=username+", আমি আপনার জন্য অপেক্ষা করছি। আপনি কি আমার সাথে আর কথা বলতে চান ? ";
+                  // else resp="Hey!! "+username+". I'm eagerly waiting for your response. </br> Do you wish to continue chatting ?? ";
+
+
+
+                  // idle_flag=1;
+                  // matching_flag=0;
+
+                  // var markup1 = "<tr><td class='text-right botresponsecss' style='line-height: 25px'>" + resp + "</td></tr>";
+
+                  // $("#tblconv").append(markup_bot);
+                  // $("#tblconv").append(markup1);
+                  // var div = $('#tbldiv');
+                  // div.animate({scrollTop: 500000}, 50);
+                  // $("#messageText").val("");
+
+                  // socket.emit('transcript_bot', { data: { message: resp, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+
+              }
+
+          }
+
+
+
+          (function() {
+
+              //alert("Root Function...");
+
+              var receivedMsg;
+              var session;
+              var maximum=10;
+              var minimum=1;
+              var flag=0;
+              var count=0;
+              var radio_count=0;
+              var password_flag=0;
+              var input;
+              var intr_flag=0;
+              var resp;
+
+
+              // socket.on('connect', function () {
+              //   console.log("You're connected to our server...");
+              //   var username = $.cookie("realtime-chat-nickname");
+              //   socket.emit('my_connecti', { data: username});
+              // });
+
+              // socket.on('disconnect', function(){
+              //
+              //   var username = $.cookie("realtime-chat-nickname");
+              //   console.log("chat disconnected");
+              //   socket.emit('my_disconnection', { data: username});
+              // });
+
+              socket.on("message", function (message) {
+
+                  console.log("Message event......");
+                  receivedMsg = message;
+                  //alert(receivedMsg['data']);
+                  refreshMessages(message);
+              });
+              socket.on("response", function (message) {
+                  // found = resp.match("\\r");
+
+
+                // Tasnuva
+
+                  console.log("Response event....");
+
+
+                  receivedMsg = message;
+                  console.log("response is ",resp);
+                  console.log("check whether radio button found or not ", receivedMsg['data']['message'].indexOf("\\r"));
+
+                  if (receivedMsg['data']['message'].indexOf("\\r")!=-1){
+                      $("#displayDiv").show();
+
+                       clearInterval(idleInterval);
+                       idleInterval = setInterval(timerIncrement, 1000); // 1 second
+                       idleTime=31;
+                        //console.log("Idle interval is: ", idleInterval);
+                  }
+                  else if (receivedMsg['data']['message'].indexOf("\\D")!=-1){
+                      $("#displayDiv").show();
+
+                       clearInterval(idleInterval);
+                       idleInterval = setInterval(timerIncrement, 1000); // 1 second
+                       idleTime=301;
+                        //console.log("Idle interval is: ", idleInterval);
+                  }
+
+                  console.log("response block printing received message: ", receivedMsg['data']['message']);
+
+
+                  //alert(receivedMsg['data']);
+                  // Tasnuva
+
+                  refreshMessages(message);
+              });
+
+              function refreshMessages(message) {
+
+
+
+                  //alert("Response block...");
+
+                  $("input[name=radios]:checked").removeAttr("checked");
+
+                  document.getElementById('sendMessage').style.display ='' ;
+                  document.getElementById('messageText').style.display ='' ;
+
+
+                  if( no_match_flag==0){
+
+                      resp=message.data.message;
+                      match= message.data.match;
+
+                  }
+                  else {
+
+
+                      resp=message;
+
+                      no_match_flag=0;
+                      //alert(resp);
+
+                  }
+
+
+
+                  // var $txtarea = $("<textarea />");
+                  //   $txtarea.attr("id", this.id);
+                  //   $txtarea.attr("rows", 8);
+                  //   $txtarea.attr("cols", 60);
+                  //   $txtarea.val(this.value);
+                  //   $(messageText).replaceWith($txtarea);
+
+
+
+
+
+                  document.getElementById('positiontext').style.display ='none' ;
+                  document.getElementById('submitMessage').style.display ='none' ;
+
+                      
+
+
+
+
+                  if(resp.indexOf("\\r")!=-1 ){
+                      document.getElementById("tblconv").innerHTML="";
+                  }
+                  else if(resp.indexOf("\\D")!=-1){
+
+                      document.getElementById("tblconv").innerHTML="";
+                      resp=resp.replace("\\D","");
+
+                      document.getElementById('positiontext').style.display ='' ;
+                      document.getElementById('submitMessage').style.display ='' ;
+                      document.getElementById('sendMessage').style.display ='none' ;
+                      document.getElementById('messageText').style.display ='none' ;
+
+
+                      //$("#written").val("");
+
+
+                  $("#submitMessage").on("click", function (event) {
+
+                          
+                          event.preventDefault();
+                          //var conf_val=confirm("Are you sure to submit your answer ?? ");
+
+                          //alert("Confirm Value: ", conf_val);
+                          //alert(conf_val==false);
+
+                          //if(conf_val==false)
+                          //    return;
+
+                          //$(".confirm").confirm();
+
+                         
+                          $.confirm({
+                            text: "Are you sure to submit this question?",
+                            confirm: function() {
+
+                                var msg=($('#written').val());
+
+                                  //alert(msg);
+
+                                  var username = $.cookie("realtime-chat-nickname");
+                                  var author=username;
+                                  var mobile_no=$.cookie("mobile_number");
+                                  var session=$.cookie("session_id");
+
+                                  var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                                  var markup = "<tr><td class='usersaycss'>" + msg + "</td></tr>";
+                                  $("#tblconv").append(markup_user);
+                                  $("#tblconv").append(markup);
+                                  var div = $('#tbldiv');
+                                  div.animate({scrollTop: 500000}, 50);
+                                  $("#written").val("");
+
+
+
+                                          d = new Date();
+                                          full=formatDate(d, "d MMM yyyy");
+                                          x = formatDate(d, "dddd h:mmtt");
+
+
+                                          socket.emit('response', { data: { message: msg, author: author, Session: session, mobile_no: mobile_no,time:x  } });
+
+                                          socket.emit('transcript_user', { data: { message: msg, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+                                    },
+
+                                  cancel: function() {
+
+                                  }
+
+                            
+                            });
+
+
+                      });
+
+
+                      //
+                  }
+
+                  //$('#sendMessage').off('click');
+
+                  if (typeof match !== 'undefined') {
+                      // the variable is defined
+
+
+                      //alert("match in response block="+match);
+
+
+                  }
+
+
+
+
+
+
+                  function urlifyy(text) {
+                      var urlRegex = /(([a-z]+:\/\/)?(([a-z0-9\-]+\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel|local|internal))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$)/gi;
+                      str1 = text.replace(/\\n/g, '<br />');
+                      return str1.replace(urlRegex, function(url) {
+
+                          if(url.indexOf("http://")== -1 && url.indexOf("www.") >= 0 && url.indexOf("https://")== -1){ return '<a href="'+ 'http://' + url + '">' + url + '</a>';}
+                          else if (url.indexOf("http://")== -1 && url.indexOf("www.")== -1 && url.indexOf("https://")== -1) {return '<a href="'+ 'http://www.' + url + '">' + url + '</a>';}
+                          else {return '<a href="' + url + '">' + url + '</a>';}
+                      });
+                  }
+
+
+                  //alert(resp);
+                  //alert(typeof(resp));
+
+                  password_flag=0;
+
+                  var input = document.getElementById('messageText');
+
+
+
+                  if(resp.toUpperCase().indexOf('PASSWORD')!=-1){
+
+                      password_flag=1;
+
+                  }
+                  //$.cookie("password_flag", password_flag);
+                  //alert("Password_flag= "+password_flag);
+
+                  if(password_flag === 1){
+                      input.setAttribute('type','password');
+                  } else{
+                      input.setAttribute('type','text');
+                  }
+
+                  var author = $.cookie("realtime-chat-nickname");
+                  var mobile_no=$.cookie("mobile_number");
+                  var session=$.cookie("session_id");
+
+                  var rule="\\r";
+                  flag=0;
+
+                  fallback1="I am sorry! X, Please call 16205 for further assistance. \\n Email:- contact.center@bankasia-bd.com";
+                  fallback2="My response is limited! X, Please call 16205 for further assistance. \\n Email:- contact.center@bankasia-bd.com";
+                  fallback3="I can't answer at this moment X, Please call 16205 for further assistance. \\n Email:- contact.center@bankasia-bd.com";
+
+
+
+                  //alert(bangla_flag);
+
+                  if(bangla_flag==1){
+
+                      console.log("dhukse............");
+
+                      resp=resp.trim();
+
+                      console.log(resp);
+                      console.log(fallback1);
+
+
+                      if(resp.indexOf(fallback1)!= -1 || resp.indexOf(fallback2)!=-1 || resp.indexOf(fallback3)!=-1  ) {
+
+
+                          fallback_response1="আমি দুঃখিত, X, এই ব্যাপারে আমি কোন সহযোগিতা করতে পারছি না।\\n বিস্তারিত জানার জন্য যে কোন অপারেটর থেকে কল করুন ১৬২০৫/০৯৬১৭০১৬২০৫ নম্বরে।\\n ই-মেইল:-  contact.center@bankasia-bd.com\\n আমাদের সাথে থাকার জন্য আপনাকে অসংখ্য ধন্যবাদ।";
+                          fallback_response2="আমি দুঃখিত, X, এই মুহূর্তে আমি কিছু বলতে পারছি না। \\n বিস্তারিত জানার জন্য যে কোন অপারেটর থেকে কল করুন ১৬২০৫/০৯৬১৭০১৬২০৫ নম্বরে।\\n ই-মেইল:-  contact.center@bankasia-bd.com\\n আমাদের সাথে থাকার জন্য আপনাকে অসংখ্য ধন্যবাদ।";
+                          fallback_response3=" দুঃখিত, X, আমি ঠিক বুঝতে পারছি না!! \\n বিস্তারিত জানার জন্য যে কোন অপারেটর থেকে কল করুন ১৬২০৫/০৯৬১৭০১৬২০৫ল নম্বরে।\\n ই-মেইল:-  contact.center@bankasia-bd.com\\n আমাদের সাথে থাকার জন্য আপনাকে অসংখ্য ধন্যবাদ।";
+
+                          var textArray = [
+                              fallback_response1,
+                              fallback_response2,
+                              fallback_response3
+                          ];
+                          var randomNumber = Math.floor(Math.random()*textArray.length);
+
+
+                          resp=textArray[randomNumber];
+
+
+                      }
+
+
+
+                  }
+
+
+
+
+                  if(resp.indexOf(" X,")!= -1 ){
+                  
+                      resp=resp.replace(/X,/g,author+".");
+                      console.log(resp);
+                  }
+                  
+                  
+                  if(resp.indexOf("Hello!")!= -1 ){
+                  
+                      resp=resp+"  "+author+". \\n How can I help you??";
+                      console.log(resp);
+                  }
+                  else if(resp.indexOf("Hi!")!= -1 ){
+                  
+                      resp=resp+"  "+author+". \\n How may I help you??";
+                      console.log(resp);
+                  }
+                  else if(resp.indexOf("Greetings!")!= -1 ){
+                  
+                      resp=resp+"  "+author+". \n How can I help you??";
+                  }
+                  else if(resp.indexOf("Good day!")!= -1 ){
+                  
+                      resp=resp+"  "+author+". \n How can I help you??";
+                  }
+                  else if(resp.indexOf("Hey!")!= -1 ){
+                  
+                      resp=resp+"  "+author+". How can I help you??";
+                  }
+
+
+                  //rad_arr[0]="Account Opening";
+                  //rad_arr[1]="Products and Services";
+                  //rad_arr[2]="Fees and Charges";
+                  //rad_arr[3]="Others";
+
+
+
+                  if(resp.indexOf(rule) != -1 ){
+
+                      //alert("dhukse");
+
+
+                      var fields = resp.split(rule);
+
+                      var resp_rad=resp;
+
+                      resp= fields[0];
+                      var rad_content= fields[1];
+                      flag=1;
+                  //      clearInterval(idleTime);
+                  // idleTime=31;
+
+
+                  }
+
+                  function radio() {
+
+                      console.log("radio function called");
+                  //      clearInterval(idleTime);
+                  // idleTime=31;
+
+                    document.getElementById('sendMessage').style.display ='none' ;
+                    document.getElementById('messageText').style.display ='none' ;
+
+
+
+                      rule="\\r";
+
+                      // rule="\\r";
+// console.log("check whether radio button found or not ", receivedMsg['data']['message'].indexOf("\\r"))
+
+
+
+
+                      count=0;
+                      //alert(typeof(flag));
+
+
+                      //console.log((resp.match(/,/g) || []).length);
+
+                      //count= (resp.match(/,/g) || []).length;
+                      //count++;
+                      //alert(count);
+                      //alert(typeof(count));
+
+
+
+
+                      count= (rad_content.match(/,/g) || []).length;
+                      count++;
+                      console.log(count);
+                      console.log(typeof(count))
+
+                      fields=rad_content.split(",");
+
+                      console.log(fields[0],fields[1]);
+                       // clearInterval(idleTime);
+                       //  idleTime=31;
+
+
+                      radio_count++;
+
+                      rad_arr.length = 0;
+
+
+                      //if(count>2)
+                      markkup_rad[radio_count]= "<tr><td class=' botresponsecssradio'> <form id='myForm"+radio_count+"'>";
+
+                      for(i=1; i<=count; i++){
+
+
+                          if(count>2){
+                              console.log("if count>2 ", fields[i-1]);
+                              markkup_rad[radio_count] += "<input type='radio' name='radios' value='"+fields[i-1]+"'/>"+fields[i-1]+ "<br />"
+                              rad_arr[i-1]=fields[i-1];
+                              //$("#tblconv").append(markup_rad);
+                          }
+                          else{
+                              //markup_rad= "<tr><td class=' botresponsecssradio'> <form id='myForm"+radio_count+"'>" + "<input type='radio' name='radios' value='"+fields[i-1]+"'/>"+fields[i-1]+" </form></td></tr>";
+                              //$("#tblconv").append(markup_rad);
+                              rad_arr[i-1]=fields[i-1];
+                              markkup_rad[radio_count] += "<input type='radio' name='radios' value='"+fields[i-1]+"'/>"+fields[i-1];
+                          }
+
+                      }
+
+
+                      markkup_rad[radio_count] += " </form></td></tr>"
+
+                      //alert(rad_content);
+                      //alert(typeof(rad_content));
+                      //flag=1;
+
+
+
+
+
+
+                  }
+
+                  if((resp.indexOf("contact.center@bankasia-bd.com") != -1))
+                      resp = resp.replace(/\\n/g, '<br />');
+
+                  else if((resp.indexOf("http://omniaccount.bankasia-bd.com/omni/f?p=103:57:189934202241::NO:::") != -1)){
+
+                      resp=resp.replace("http://omniaccount.bankasia-bd.com/omni/f?p=103:57:189934202241::NO:::","<a href= 'http://omniaccount.bankasia-bd.com/omni/f?p=103:57:189934202241::NO:::'>Click here</a>");
+                      resp = resp.replace(/\\n/g, '<br />');
+
+                  }
+                  else if((resp.indexOf("http://job.erainfotechbd.com:8888/hr/f?p=100:1:2524620618320548") != -1)){
+
+                      resp=resp.replace("http://job.erainfotechbd.com:8888/hr/f?p=100:1:2524620618320548","<a href= 'http://job.erainfotechbd.com:8888/hr/f?p=100:1:2524620618320548'>Click here</a>");
+                      resp = resp.replace(/\\n/g, '<br />');
+
+                  }
+                  else
+                      resp=urlifyy(resp);
+                  //alert(resp);
+                  //resp=resp_final
+
+
+
+
+                  d = new Date();
+                  full=formatDate(d, "dddd h:mmtt d MMM yyyy");
+                  x = formatDate(d, "dddd h:mmtt");
+
+
+                  var markup_bot=  "<tr><td class='text-right botresponsecssmaya'><img src='static/maya2.png' alt='Avatar' class='avatar'><small class='text-muted'>e-Recruitment "+x+"</small></td></tr>";
+                  var markup = "<tr><td class='text-right botresponsecss'>" + resp + "</td></tr>";
+
+                  //if(flag ==1){ markup_rad= "<tr><td class='botresponsecss'> <input type='radio' name='radios' id='radio1' /> <label for='radio1'>Company</label>  </td></tr>"; }
+
+
+                  $("#tblconv").append(markup_bot);
+                  $("#tblconv").append(markup);
+
+                  //    idleTime=30;
+
+
+
+
+                  if(flag == 1) {
+
+
+
+                      radio();
+
+                      //if(count>2)
+                      $("#tblconv").append(markkup_rad[radio_count]);
+                      //console.log(document.querySelector('input[name=radios]:checked').value);
+
+
+                      // for(i=0;i<radio_count;i++)
+                      //   console.log(markkup_rad[i]);
+                      //
+                      // console.log("radio_count= ",radio_count);
+
+
+
+                      param[radio_count]='myForm'+radio_count+' input';
+                      param1[radio_count]='myForm'+radio_count
+
+                      $('#'+ param[radio_count]).on('change', function(event) {
+                          //alert($('input[name=radios]:checked', '#myForm').val());
+
+
+                          // console.log("Radio_Checked:: ",$('input[name=radios]:checked', '#'+param1[radio_count]).val());
+
+                          event.preventDefault();
+
+                          rad_val=$('input[name=radios]:checked', '#'+param1[radio_count]).val();
+
+                          if(idleTime==0 || 'input[name=radios]:checked'){
+                              $("input[name='radios']").attr("disabled", true);
+                          }
+                          console.log("Radio_Checked:: ---", rad_val, rad_val.length)
+
+
+
+
+                          // clearInterval(idleInterval);
+                          // console.log("Ideal Interval:",idleInterval);
+                          // idleTime=31;
+
+
+
+
+
+
+
+                          //$("#messageText").val(rad_val);
+
+
+                          if(rad_val!=undefined){
+
+
+
+                              message=rad_val;
+
+                              var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                              $("#tblconv").append(markup_user);
+
+                              var markup_sp = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+                              $("#tblconv").append(markup_sp);
+                              var div = $('#tbldiv');
+                              div.animate({scrollTop: 500000}, 50);
+
+                              //$('#myForm').trigger("reset");
+
+                              d = new Date();
+                              full=formatDate(d, "d MMM yyyy");
+                              x = formatDate(d, "dddd h:mmtt");
+
+                              socket.emit('response', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, time:x } });
+
+                              socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+                          }
+
+
+
+
+
+
+                          //sendMessage();
+
+                      });
+
+
+                      $('#'+ param[radio_count-1]).on('change', function(event) {
+                          //alert($('input[name=radios]:checked', '#myForm').val());
+
+
+                          // console.log("Radio checked::: ",$('input[name=radios]:checked', '#'+param1[radio_count-1]).val());
+
+                          event.preventDefault();
+                          rad_val=$('input[name=radios]:checked', '#'+param1[radio_count-1]).val();
+                          console.log("Radio checked::: ......", rad_val)
+
+                          //$("#messageText").val(rad_val);
+
+                          // if len(message)==0 || rad_val==
+
+
+                          if(rad_val!=undefined){
+
+                              message=rad_val;
+
+                              var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                              $("#tblconv").append(markup_user);
+
+                              var markup_sp = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+                              $("#tblconv").append(markup_sp);
+                              var div = $('#tbldiv');
+                              div.animate({scrollTop: 500000}, 50);
+
+
+                              //$('#myForm').trigger("reset");
+
+
+
+                              d = new Date();
+                              full=formatDate(d, "d MMM yyyy");
+                              x = formatDate(d, "dddd h:mmtt");
+
+                              socket.emit('response', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, time:x } });
+                              socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+
+
+                          }
+
+                          //sendMessage();
+
+                      });
+
+
+                      $('#'+ param[radio_count-1]).on('change', function(event) {
+                          //alert($('input[name=radios]:checked', '#myForm').val());
+
+                          event.preventDefault();
+
+
+                          console.log("Radio checked::: ",$('input[name=radios]:checked', '#'+param1[radio_count-1]).val());
+
+                          rad_val=$('input[name=radios]:checked', '#'+param1[radio_count-2]).val();
+
+                          //$("#messageText").val(rad_val);
+
+
+                          if(rad_val!=undefined){
+
+                              message=rad_val;
+
+                              var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                              $("#tblconv").append(markup_user);
+
+                              var markup_sp = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+                              $("#tblconv").append(markup_sp);
+                              var div = $('#tbldiv');
+                              div.animate({scrollTop: 500000}, 50);
+
+                              //$('#myForm').trigger("reset");
+
+
+
+                              d = new Date();
+                              full=formatDate(d, "d MMM yyyy");
+                              x = formatDate(d, "dddd h:mmtt");
+
+                              socket.emit('response', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, time:x } });
+                              socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+
+
+                          }
+
+                          //sendMessage();
+
+                      });
+
+
+                  }
+                  // if(flag==1)
+                  //       $("#tblconv").append(markup_rad);
+
+                  var div = $('#tbldiv');
+                  div.animate({scrollTop: 500000}, 50);
+                  $("#messageText").val("");
+
+
+                  d = new Date();
+                  full=formatDate(d, "d MMM yyyy");
+                  x = formatDate(d, "dddd h:mmtt");
+
+                  //alert(resp);
+
+
+                  if (flag==0)
+                      socket.emit('transcript_bot', { data: { message: resp, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+                  else if (flag==1)
+                      socket.emit('transcript_bot', { data: { message: resp_rad, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+                  else{
+
+                      alert("Flag mismatch");
+                      return;
+                  }
+
+
+              }
+
+
+
+
+
+
+              $(function () {
+
+                  //alert(flag);
+                  console.log("Login Block..");
+
+                  if (window.performance) {
+                      //alert("window.performance work's fine on this browser");
+                  }
+                  // if (performance.navigation.type == 1) {
+                  //       alert( "This page is reloaded" );
+                  //       var username = $.cookie("realtime-chat-nickname");
+                  //       //alert(username);
+                  //       //alert("chat disconnected");
+                  //       //socket.emit('disconnect');
+                  //       //socket.emit('discon', { data: username});
+                  //
+                  //
+                  //
+                  //       window.location="/chatting";
+                  //       return;
+                  //   } else {
+                  //     //alert( "This page is not reloaded");
+                  //   }
+
+                  if (typeof $.cookie("realtime-chat-nickname") === 'undefined') {
+
+                      console.log("Login If....");
+                      //Session_flow();
+                      window.location = "/";
+                      //session=Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+
+
+                  } else {
+
+                      console.log("Login Else....");
+                      //window.location = "/";
+
+                      d = new Date();
+                      full=formatDate(d, "dddd h:mmtt d MMM yyyy");
+                      x = formatDate(d, "dddd h:mmtt");
+
+
+                      var author = $.cookie("realtime-chat-nickname");
+                      var mobile_no= $.cookie("mobile_number");
+                      var session=$.cookie("session_id");
+
+
+                      // Tasnuva
+                      var res=" Hello!! "+author+ ".";
+                      var markup_bot=  "<tr><td class='text-right botresponsecssmaya'><img src='static/maya2.png' alt='Avatar' class='avatar'><small class='text-muted' style='bottom:5px'>e-Recruitment "+x+"</small></td></tr>";
+                      var markup = "<tr><td class='text-right botresponsecss'>" + res+ "</td></tr>";
+                      resp=" ";
+                      resp="Greetings from ERA !! I am your E-recruitment assistant. Please select a quick option below";
+
+                      console.log(author);
+                      var markup1 = "<tr><td class='text-right botresponsecss' style='line-height: 25px'>" + resp + "</td></tr>";
+                      //var resp=" Testing...........";
+                      var markup2 = "<tr><td class='text-right botresponsecss'>" + resp + "</td></tr>";
+
+                      markup_rad= "<tr><td class=' botresponsecssradio'> <form id='myFormInt'>";
+                      markup_rad += "<input type='radio' name='radios' value='Interview'/> Interview<br />";
+                      markup_rad += "<input type='radio' name='radios' value='Vacancy Announcement'/> Vacancy Announcement <br />";
+                      markup_rad += "<input type='radio' name='radios' value='Contact HR'/>           Contact HR<br />";
+                      // markup_rad += "<input type='radio' name='radios' value='Others'/>          Others<br />";
+                      markup_rad += " </form></td></tr>"
+
+
+                      //if(flag ==1){ markup_rad= "<tr><td class='botresponsecss'> <input type='radio' name='radios' id='radio1' /> <label for='radio1'>Company</label>  </td></tr>"; }
+
+                      $("#tblconv").append(markup_bot);
+                      $("#tblconv").append(markup);
+                      // $("#tblconv").append(markup1);
+                      $("#tblconv").append(markup2);
+                      $("#tblconv").append(markup_rad);
+
+
+                      flag=1;
+
+                      rad_arr=[];
+                      //
+                      rad_arr[0]="Interview";
+                      rad_arr[1]="Vacancy Announcement";
+                      rad_arr[2]="Contact HR";
+                      // //rad_arr[3]="Others";
+
+                      // Tasnuva
+
+
+
+
+                      $('#myFormInt').on('change', function() {
+                          //alert($('input[name=radios]:checked', '#myForm').val());
+
+
+                          console.log($('input[name=radios]:checked', '#myFormInt').val());
+
+                          rad_val=$('input[name=radios]:checked', '#myFormInt').val();
+
+                          //$("#messageText").val(rad_val);
+
+
+
+                          message=rad_val;
+
+                          console.log(author);
+
+                          d = new Date();
+                          full=formatDate(d, "d MMM yyyy");
+                          x = formatDate(d, "dddd h:mmtt");
+
+                          var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                          $("#tblconv").append(markup_user);
+                          var markup_sp = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+                          $("#tblconv").append(markup_sp);
+                          var div = $('#tbldiv');
+                          div.animate({scrollTop: 500000}, 50);
+
+                          //$('#myForm').trigger("reset");
+
+                          socket.emit('response', { data: { message: message, author: author, Session: session, mobile_no: mobile_no,time:x } });
+                          socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+
+                          //sendMessage();
+
+                      });
+
+
+                      $("#refresh").on("click", function () {
+
+
+                          alert(author+", Refreshing page will destroy your running interview!!");
+                          window.location="/chatting";
+                          //sendMessage()
+                      });
+
+
+                      // $("#bangla").on("click", function () {
+                      //
+                      //     var author = $.cookie("realtime-chat-nickname");
+                      //
+                      //     alert( author+", Language will be changed to bangla....");
+                      //
+                      //     bangla_flag=1;
+                      //
+                      //     //window.location="/chatting";
+                      //
+                      //     $("#tblconv").html("");
+                      //
+                      //     d = new Date();
+                      //     full=formatDate(d, "d MMM yyyy");
+                      //     x = formatDate(d, "dddd h:mmtt");
+                      //
+                      //
+                      //
+                      //     var author = $.cookie("realtime-chat-nickname");
+                      //     var res=" হ্যালো !! "+author+ ".";
+                      //     var markup_bot=  "<tr><td class='text-right botresponsecssmaya'><img src='static/maya2.png' alt='Avatar' class='avatar'><small class='text-muted'>আভা :--"+x+"</small></td></tr>";
+                      //     var markup = "<tr><td class='text-right botresponsecss'>" + res+ "</td></tr>";
+                      //     var resp=" ব্যাংক এশিয়ার পক্ষ থেকে আপনাকে স্বাগতম!! আমি কিভাবে আপনাকে সহযোগিতা করতে পারিঃ ";
+                      //
+                      //     console.log(author);
+                      //     var markup1 = "<tr><td class='text-right botresponsecss' style='line-height: 25px'>" + resp + "</td></tr>";
+                      //     //var resp=" Testing...........";
+                      //     //var markup2 = "<tr><td class='text-right botresponsecss'>" + resp + "</td></tr>";
+                      //
+                      //     markup_rad= "<tr><td class=' botresponsecssradio'> <form id='myFormIntB'>";
+                      //     markup_rad += "<input type='radio' name='radios' value='অ্যাকাউন্ট খোলা'/>            অ্যাকাউন্ট খোলা<br />";
+                      //     markup_rad += "<input type='radio' name='radios' value='পণ্য এবং সেবা'/>           পণ্য এবং সেবা <br />";
+                      //     markup_rad += "<input type='radio' name='radios' value='ফি এবং চার্জ'/>            ফি এবং চার্জ<br />";
+                      //     //markup_rad += "<input type='radio' name='radios' value='অন্যান্য'/>          অন্যান্য <br />";
+                      //     markup_rad += " </form></td></tr>"
+                      //
+                      //     flag=1;
+                      //
+                      //     //rad_arr=[];
+                      //
+                      //     rad_arr[0]="অ্যাকাউন্ট খোলা";
+                      //     rad_arr[1]="পণ্য এবং সেবা ";
+                      //     rad_arr[2]="ফি এবং চার্জ";
+                      //     //rad_arr[3]="অন্যান্য";
+                      //
+                      //
+                      //     //if(flag ==1){ markup_rad= "<tr><td class='botresponsecss'> <input type='radio' name='radios' id='radio1' /> <label for='radio1'>Company</label>  </td></tr>"; }
+                      //
+                      //     $("#tblconv").append(markup_bot);
+                      //     $("#tblconv").append(markup);
+                      //     $("#tblconv").append(markup1);
+                      //     //$("#tblconv").append(markup2);
+                      //     $("#tblconv").append(markup_rad);
+                      //
+                      //
+                      //
+                      //
+                      //     $('#myFormIntB').on('change', function() {
+                      //         //alert($('input[name=radios]:checked', '#myForm').val());
+                      //
+                      //
+                      //         console.log($('input[name=radios]:checked', '#myFormIntB').val());
+                      //
+                      //         rad_val=$('input[name=radios]:checked', '#myFormIntB').val();
+                      //
+                      //         //$("#messageText").val(rad_val);
+                      //
+                      //
+                      //
+                      //         message=rad_val;
+                      //         //var author = $.cookie("realtime-chat-nickname");
+                      //
+                      //         d = new Date();
+                      //         full=formatDate(d, "d MMM yyyy");
+                      //         x = formatDate(d, "dddd h:mmtt");
+                      //
+                      //         var session=$.cookie("session_id");
+                      //         var mobile_no=$.cookie("mobile_number");
+                      //         console.log(author);
+                      //
+                      //         var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                      //         $("#tblconv").append(markup_user);
+                      //         var markup_sp = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+                      //         $("#tblconv").append(markup_sp);
+                      //         var div = $('#tbldiv');
+                      //         div.animate({scrollTop: 500000}, 50);
+                      //
+                      //         //$('#myForm').trigger("reset")
+                      //
+                      //         socket.emit('response', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, time:x } });
+                      //
+                      //         socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+                      //
+                      //
+                      //
+                      //         //sendMessage();
+                      //
+                      //     });
+                      //
+                      //
+                      //
+                      //
+                      //     //sendMessage()
+                      // });
+
+
+                      $("#sendMessage").on("click", function () {
+
+
+                          //alert(flag);
+
+                          var msg=($('#messageText').val());
+
+                          if (msg !== "")
+                              sendMessage();
+                      });
+
+                      $('#messageText').keyup(function (e) {
+                          if (e.keyCode == 13) {
+                              //Session_flow();
+
+                              var msg=($('#messageText').val());
+                              //console.log(msg);
+
+                              if (msg !== '' )
+                                  sendMessage();
+                          }
+                      });
+                  }
+
+
+
+                  function sendMessage() {
+
+
+                      console.log("Send Block...");
+                      //console.log("Response value: ", resp);
+                      //alert(rad_arr);
+                      //alert(flag);
+
+
+                      var rad_my_arr=[];
+
+                      var author = $.cookie("realtime-chat-nickname");
+                      var session=$.cookie("session_id");
+                      var mobile_no=$.cookie("mobile_number");
+
+
+
+                      //console.log(flag);
+                      //$container = $('.media-list');
+                      //$container[0].scrollTop = $container[0].scrollHeight;
+                      //session=2;
+                      //Session_flow();
+                      var message = $("#messageText").val();
+                      console.log("message from the candidate", message);
+
+                       $("#messageText").val("");
+
+                      //matching_flag=0;
+
+                      console.log(message);
+                      console.log(inner_match_flag);
+
+                      //if(message.indexOf("Isl")!= -1)
+                      //        message="Islamic";
+
+
+                      //alert(message);
+                      //alert(typeof(message));
+
+                      //var rule="/r"
+
+                      //alert("no slash /r".indexOf(rule));
+
+                      if(flag === 1 && message != '' && idle_flag==0 ){ // jodi radio content thake
+
+
+                          console.log("dhukse................");
+
+                          matching_flag=1;
+
+                          var inner_match_flag=0;
+
+                          for(i=0; i<rad_arr.length; i++){      // message jodi radio button er sathe mile jai
+
+                              rad_my_arr[i]=rad_arr[i].toUpperCase();
+                              rad_my_arr[i]=rad_my_arr[i].trim();
+
+                              if(message.toUpperCase() == rad_my_arr[i]) {
+
+                                  matching_flag=0;
+
+                                  d = new Date();
+                                  full=formatDate(d, "dddd h:mmtt d MMM yyyy");
+                                  x = formatDate(d, "dddd h:mmtt");
+
+
+
+
+                                  var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                                  var markup = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+                                  $("#tblconv").append(markup_user);
+                                  $("#tblconv").append(markup);
+                                  var div = $('#tbldiv');
+                                  div.animate({scrollTop: 500000}, 50);
+                                  $("#messageText").val("");
+
+
+
+                                  d = new Date();
+                                  full=formatDate(d, "d MMM yyyy");
+                                  x = formatDate(d, "dddd h:mmtt");
+
+
+                                  socket.emit('response', { data: { message: message, author: author, Session: session, mobile_no: mobile_no,time:x  } });
+
+                                  socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+
+
+
+                                  inner_match_flag=1
+
+
+
+                              }
+
+
+
+
+                          }
+
+
+                          if(inner_match_flag==1) return;
+
+
+
+
+
+                          //Code of mathcing Algoritm...............
+
+                          //alert("bangla_flag-"+bangla_flag);
+
+
+
+                          d = new Date();
+                          full=formatDate(d, "d MMM yyyy");
+                          x = formatDate(d, "dddd h:mmtt");
+
+                          socket.emit('matching', { data: { message: message, author: author, arr: rad_arr, Session: session, flag: bangla_flag, mobile_no: mobile_no, time:x  } });
+
+                          var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                          var markup = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+                          $("#tblconv").append(markup_user);
+                          $("#tblconv").append(markup);
+                          var div = $('#tbldiv');
+                          div.animate({scrollTop: 500000}, 50);
+                          $("#messageText").val("");
+
+
+                          socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+                          return;
+
+
+
+                      }
+
+
+
+                      if(matching_flag==1 && message != '' ){
+
+                          //alert("match in send block= "+match);
+
+
+
+
+                          var inner_match_flag=0;
+
+                          for(i=0; i<rad_arr.length; i++){  //  "did you mean" suggest korar pore check kori user response e radio er kono content ache kina
+
+
+
+                              rad_my_arr[i]=rad_arr[i].toUpperCase();
+                              rad_my_arr[i]=rad_my_arr[i].trim();
+
+                              if(message.toUpperCase().indexOf(rad_my_arr[i])!= -1) {
+
+                                  matching_flag=0;
+
+                                  d = new Date();
+                                  full=formatDate(d, "dddd h:mmtt d MMM yyyy");
+                                  x = formatDate(d, "dddd h:mmtt");
+
+
+
+
+                                  var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                                  var markup = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+                                  $("#tblconv").append(markup_user);
+                                  $("#tblconv").append(markup);
+                                  var div = $('#tbldiv');
+                                  div.animate({scrollTop: 500000}, 50);
+                                  $("#messageText").val("");
+
+
+
+
+                                  d = new Date();
+                                  full=formatDate(d, "d MMM yyyy");
+                                  x = formatDate(d, "dddd h:mmtt");
+
+                                  socket.emit('response', { data: { message: message, author: author, Session: session, mobile_no: mobile_no,time:x } });
+                                  socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+
+                                  inner_match_flag=1
+
+
+
+                              }
+
+
+                          }
+
+
+                          console.log(inner_match_flag);
+
+
+                          if(inner_match_flag==1) return;
+
+
+
+
+
+                          if(message.toUpperCase().indexOf("YES")!= -1 || message.toUpperCase().indexOf("হ্যাঁ")!=-1 || message.toUpperCase().indexOf("হ্যা")!= -1 ){  //  jodi yes bole
+
+                              console.log("Yes e dhukse..");
+
+
+                              var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                              var markup = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+
+
+
+                              $("#tblconv").append(markup_user);
+                              $("#tblconv").append(markup);
+                              var div = $('#tbldiv');
+                              div.animate({scrollTop: 500000}, 50);
+                              $("#messageText").val("");
+
+                              var temp=message;
+
+
+                              if (typeof match=='undefined'){
+
+                                  match=message;
+                              }
+
+                              message=match;
+
+
+
+                              d = new Date();
+                              full=formatDate(d, "d MMM yyyy");
+                              x = formatDate(d, "dddd h:mmtt");
+
+                              socket.emit('response', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, time:x  } });
+                              socket.emit('transcript_user', { data: { message: temp, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+
+
+
+                          }
+
+
+                          else if(message.toUpperCase()=="NO" || message.toUpperCase().indexOf("না")!= -1  ){ // jodi na bole
+
+
+
+                              var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                              var markup = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+                              $("#tblconv").append(markup_user);
+                              $("#tblconv").append(markup);
+                              var div = $('#tbldiv');
+                              div.animate({scrollTop: 500000}, 50);
+                              $("#messageText").val("");
+
+
+                              d = new Date();
+                              full=formatDate(d, "d MMM yyyy");
+                              x = formatDate(d, "dddd h:mmtt");
+
+                              //alert(message);
+                              socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+                              //alert(flag);
+
+
+
+                              message=match;
+
+
+                               if(bangla_flag==0)
+
+                                   message="Okay! "+author+", Then choose agian: \\r ";
+                               else
+                                   message="ঠিক আছে  "+author+", তাহলে আবার পছন্দ করুন : \\r ";
+
+                              for(i=0; i<rad_arr.length; i++){
+
+
+                                  message=message+rad_arr[i];
+
+                                  if(i == rad_arr.length-1)
+                                      break;
+
+                                  message= message+" , ";
+
+                              }
+
+                              console.log(message);
+
+                              no_match_flag=1;
+                              matching_flag=0;
+
+                              refreshMessages(message);
+
+
+
+                              //socket.emit('response', { data: { message: message, author: author, Session: session } });
+
+
+
+
+
+                          }
+
+                          else { // ha o na... na o na... radio content er sateheo jodi na mile......
+
+                              //console.log("dhukaiseljflsj");
+
+                              var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                              var markup = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+                              $("#tblconv").append(markup_user);
+                              $("#tblconv").append(markup);
+                              var div = $('#tbldiv');
+                              div.animate({scrollTop: 500000}, 50);
+                              $("#messageText").val("");
+
+
+
+                              d = new Date();
+                              full=formatDate(d, "d MMM yyyy");
+                              x = formatDate(d, "dddd h:mmtt");
+
+                              socket.emit('response', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+                              socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+
+
+                          }
+
+
+
+                          matching_flag=0;
+
+                          return;
+
+                      }
+
+
+                      /**************************************Jodi radio contetn na thake*************************************************/
+
+
+                      if(message != ''){
+                          function urlify(text) {
+                              var urlRegex = /(([a-z]+:\/\/)?(([a-z0-9\-]+\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel|local|internal))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$)/gi;
+                              str1 = text.replace(/\\n/g, '<br />');
+                              return str1.replace(urlRegex, function(url) {
+
+                                  if(url.indexOf("http://")== -1 && url.indexOf("www.") >= 0 && url.indexOf("https://")== -1){ return '<a href="'+ 'http://' + url + '">' + url + '</a>';}
+                                  else if (url.indexOf("http://")== -1 && url.indexOf("www.")== -1 && url.indexOf("https://")== -1) {return '<a href="'+ 'http://www.' + url + '">' + url + '</a>';}
+                                  else {return '<a href="' + url + '">' + url + '</a>';}
+                              });
+                          }
+                      }
+
+
+                      var reply="Hello...!";
+
+
+
+
+                      if(idle_flag==1) {
+
+                          idle_flag=0;
+                          var username = $.cookie("realtime-chat-nickname");
+                          var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):</small></td></tr>";
+                          //alert(message);
+                          var markup = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+                          $("#tblconv").append(markup_user);
+                          $("#tblconv").append(markup);
+                          var div = $('#tbldiv');
+                          div.animate({scrollTop: 500000}, 50);
+
+                          var message = $("#messageText").val();
+
+                          d = new Date();
+                          full=formatDate(d, "d MMM yyyy");
+                          x = formatDate(d, "dddd h:mmtt");
+
+                          socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+                          if(message.toUpperCase()=="NO"){
+
+                              //alert(bangla_flag);
+
+
+                                  resp="OK!! "+username+". Bye for now!!";
+                                  resp1= "I will be always present when You will need me!! ";
+
+
+
+
+                              var markup_bot=  "<tr><td class='text-right botresponsecssmaya'><img src='static/maya2.png' alt='Avatar' class='avatar'><small class='text-muted'>e-Recruitment "+x+"</small></td></tr>";
+
+                              var markup1 = "<tr><td class='text-right botresponsecss' style='line-height: 25px'>" + resp + "</td></tr>";
+                              var markup2 = "<tr><td class='text-right botresponsecss' style='line-height: 25px'>" + resp1 + "</td></tr>";
+
+                              $("#tblconv").append(markup_bot);
+                              $("#tblconv").append(markup1);
+                              $("#tblconv").append(markup2);
+                              var div = $('#tbldiv');
+                              div.animate({scrollTop: 500000}, 50);
+                              $("#messageText").val("");
+
+                              socket.emit('transcript_bot', { data: { message: resp+".  "+resp1, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+                              setTimeout(myFunction, 10000);
+
+                              function myFunction(){
+
+                                  //window.location="/"
+
+                              }
+
+
+                          }
+                          else{
+
+
+                              if(bangla_flag==1)
+                                  resp="ঠিক আছে! "+username+"। আমি কিভাবে আপনাকে সাহায্য করতে পারি ?? "
+                              else resp="Ok! "+username+". Then, how can help you ??";
+
+                              var markup_bot=  "<tr><td class='text-right botresponsecssmaya'><img src='static/maya2.png' alt='Avatar' class='avatar'><small class='text-muted'>e-Recruitment "+x+"</small></td></tr>";
+
+                              var markup1 = "<tr><td class='text-right botresponsecss' style='line-height: 25px'>" + resp + "</td></tr>";
+
+
+                              $("#tblconv").append(markup_bot);
+                              $("#tblconv").append(markup1);
+                              var div = $('#tbldiv');
+                              div.animate({scrollTop: 500000}, 50);
+                              $("#messageText").val("");
+
+                              socket.emit('transcript_bot', { data: { message: resp, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+                          }
+
+
+
+                          return;
+                      }
+
+
+                      if(password_flag==1)
+                          message_up="*******";
+
+                      if(message !=''){
+
+                          d = new Date();
+                          full=formatDate(d, "d MMM yyyy");
+                          x = formatDate(d, "dddd h:mmtt");
+
+                          if(password_flag==1){
+
+                              //var markup_user="<tr><td class='usersaycss'>" + author + "</td></tr>";
+                              var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                              var markup = "<tr><td class='usersaycss'>" + message_up + "</td></tr>";
+
+                          }
+
+                          else
+                          {
+                              var markup_user="<tr><td class='usersaycssid'><small class='text-muted'>" + author + " (You):--"+x+"<img src='static/user2.png' alt='Avatar' class='avatar-user'></small></td></tr>";
+                              var markup = "<tr><td class='usersaycss'>" + message + "</td></tr>";
+
+                          }
+
+
+                      }
+
+
+
+                      $("#tblconv").append(markup_user);
+                      $("#tblconv").append(markup);
+                      var div = $('#tbldiv');
+                      div.animate({scrollTop: 500000}, 50);
+                      $("#messageText").val("");
+
+
+
+                      d = new Date();
+                      full=formatDate(d, "d MMM yyyy");
+                      x = formatDate(d, "dddd h:mmtt");
+
+                      socket.emit('response', { data: { message: message, author: author, Session: session, mobile_no: mobile_no,time:x } });
+
+                      if(password_flag==1)
+                          socket.emit('transcript_user', { data: { message: message_up, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+                      else
+                          socket.emit('transcript_user', { data: { message: message, author: author, Session: session, mobile_no: mobile_no, full:full, time:x } });
+
+
+
+
+                      //$container.animate({ scrollTop: $container[0].scrollHeight }, "slow");
+                  }
+              })
+
+          })();
+
+      });
+
+
+  </script>
+
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.css" rel="stylesheet">
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+
+      body{
+          /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#1e5799+7,2989d8+50,207cca+100 */
+background: rgb(30,87,153); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(30,87,153,1) 7%, rgba(41,137,216,1) 50%, rgba(32,124,202,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top, rgba(30,87,153,1) 7%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom, rgba(30,87,153,1) 7%,rgba(41,137,216,1) 50%,rgba(32,124,202,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1e5799', endColorstr='#207cca',GradientType=0 ); /* IE6-9 */
+      }
+    .media-list {
+      overflow: auto;
+    }
+
+
+    .avatar {
+      vertical-align: middle;
+      width: 6vh;
+      height: 6vh;
+      border-radius: 50%;
+      margin-left:-2vh;
+      margin-right:1vh;
+
+    }
+
+    .avatar-user {
+      vertical-align: middle;
+      width: 6vh;
+      height: 6vh;
+      border-radius: 50%;
+      margin-right:-2vh;
+
+    }
+    .usersaycss {
+    //display:inline-block;
+      float:right;
+      /*background-color:#f5f4ea;*/
+      background-color: #8fa3aa;
+      height:auto;
+      border-radius:10px;
+      font-weight:300;
+      font-family:  Verdana, sans-serif;
+      font-size:2vh;
+      color: black;
+    }
+    .usersaycssid {
+      /*//display:inline-block;*/
+      float:right;
+      /*//background-color:#e0efac;*/
+      /*//height:auto;*/
+
+      border-radius:10px;
+
+      font-family:  Verdana, sans-serif;
+      font-size:1.7vh;
+    //text-decoration: underline;
+      text-align:right;
+      font-weight:600;
+
+    }
+    .botresponsecss {
+      /*//float:right;*/
+      text-align: left;
+      margin-top: 1vh;
+      display:inline-block;
+      background-color:#81d2ef;
+      height:auto;
+      border-radius:2vh;
+      font-family: Verdana, sans-serif;
+      font-size:2vh;
+      /*//letter-spacing: 0.01vh;*/
+      color:black;
+    }
+    .botresponsecssmaya {
+      /*//float:right;*/
+      text-align: left;
+      display:inline-block;
+      margin-top: 1vh;
+      margin-bottom: 1vh;
+      /*//background-color:#4cb29f;*/
+      height:auto;
+      border-radius:2vh;
+      font-family: Verdana, sans-serif;
+      font-size:1.7vh;
+      font-weight:600;
+
+
+    //font-color:white;
+    }
+    .botresponsecssradio {
+      /*//float:right;*/
+      /*//background-color:#4cb29f;*/
+      margin-top: 1vh;
+      display:inline-block;
+      height:auto;
+      border-radius:2vh;
+      background-color:#aed4e8;
+      font-family: Verdana, sans-serif;
+      font-size:2vh;
+      font-color:white;
+    }
+
+
+    #refresh {
+    //float:right;
+      background-color:#1E61AF;
+      display:inline-block;
+
+      border-radius:6vh;
+    //background-color:#a2b;
+      font-family: Verdana, sans-serif;
+      font-size:2vh;
+      font-color:black;
+    }
+
+    #bangla {
+    //float:right;
+      background-color:#1E61AF;;
+    //display:inline-block;
+
+      border-radius:6vh;
+    //background-color:#a2b;
+      font-family: Verdana, sans-serif;
+      font-size:2vh;
+      font-color:black;
+
+    }
+
+
+    .powerdby {
+      margin-top: -0.4vh;
+      height:3vh;
+      width:10vh;
+      font-weight:200;
+    }
+
+    .imglogo {
+      max-height:85%;
+      width: 100%;
+      /*margin-bottom: 2%;*/
+    }
+
+
+    html, body {height: 100vh;}
+
+    #content, .container, .span9
+    {
+
+
+      height:100%;
+      width: 100%;
+    }​
+     .fill {
+       min-height: 100%;
+       height: 100%;
+     }
+
+    .main-wrapper {
+      height: 100vh;
+
+
+
+    }
+    .section {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .pos_center {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      /*text-align: center;*/
+    }
+
+    .nopadormar {
+      padding-top:0;
+      padding-bottom:0;
+      padding-left:0;
+      padding-right:0;
+      margin-top:0;
+      margin-bottom:0;
+      margin-left:0;
+      margin-right:0;
+    }
+
+    .table td {
+
+      border-top: none !important;
+    //border-spacing: 5vh;
+    }
+
+
+  </style>
+</head>
+
+<body oncontextmenu="return false;" class="main-wrapper" style="background-color:#1c355e; overflow:hidden;">
+<div class=" main-wrapper nopadormar">
+  <div class="col-md-4 col-md-offset-4 col-xl-4 col-xl-offset-4 col-lg-4 col-lg-offset-4 col-sm-8 col-sm-offset-2 col-xs-10 col-xs-offset-1 section main-wrapper">
+    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 section nopadormar main-wrapper" style="width:64vh; height:100vh;">
+      <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 " style="min-height: 6vh; background-color:#1E61AF;padding:0;">
+        <table class="">
+          <tr>
+            <td style="width:28%;"><a href="https://www.erainfotechbd.com/"><img class="imglogo" height="100px" src="../static/jobinterview.jpg"></a></td>
+
+          </tr>
+        </table>
+      </div>
+      <div id="textshow" class="col-md-12 col-lg-12 col-sm-12 col-xs-12 nopadormar" style="min-height:68vh;">
+
+        <div class="col-md-12  col-xl-12 col-lg-12 col-sm-12 col-xs-12 nopadormar" style="padding-top:1vh; padding-bottom: 1vh; min-height: 3vh; font-family:Courier;font-size:2vh; color:#820402;background-color:#e8e9ed;">
+          <div class="col-md-2 col-xl-2 col-lg-2 col-sm-2 col-xs-2 pos_center nopadormar" style="padding-left:1vh;">
+            <button class="btn btn-info pos_center" type="button" id="refresh" style="height:5vh; width:auto;font-size:1.8vh; ">Refresh<!span class="glyphicon glyphicon-refresh pos_center"></button>
+          </div>
+
+          <!--<div class="col-md-2 col-xl-2 col-lg-2 col-sm-2 col-xs-2 pos_center nopadormar">-->
+          <!--<button class="btn btn-info pos_center" type="button" id="bangla" style="height: 5vh; width:8vh; font-size:2vh;"><span class=" pos_center">বাংলা</span></button>-->
+          <!--</div>-->
+          <!--// Tasnuva-->
+          <div class ="text-center col-md-5 col-xl-5 col-lg-5 col-sm-5 col-xs-5 pos_center nopadormar" id="displayDiv" style="color:black; padding-top:1vh; text-align: center; display: none;">
+            <strong>Timer:30</strong>
+          </div>
+          <div class="col-md-5 col-xl-5 col-lg-5 col-sm-5 col-xs-5 pos_center nopadormar" style="padding-top:1vh; float: right">
+
+            <P><strong style="color:#7d8084;">POWERED BY  </strong>
+              <a href="http://www.erainfotechbd.com/"><img class="powerdby" src="static/ERA.png"></a>
+            </P>
+
+          </div>
+        </div>
+
+
+        <div class="col-12 col-md-12 col-lg-12 col-sm-12 col-xs-12" id="tbldiv" style="height:67vh; padding-top:1vh; padding-bottom:1vh; background-color:#f9f9f9; overflow-y: auto;">
+
+          <table id="tblconv" class="table" style="border-spacing: 0vh; border-collapse:separate; border-top: none ; overflow-y: auto;">
+          </table>
+        </div>
+      </div>
+      <span class="border border-dark" style="min-height:6vh;width:64vh;">
+              <div class=" col-12 col-md-12 col-lg-12 col-sm-12 col-xs-12 nopadormar" style="background-color:#ede8e8;">
+
+                <div id="positiontext" style="display: none;">
+                    <textarea rows="12" cols="52" maxlength="254" name="" id="written" oncopy="return false" onpaste="return false" style="margin-left:1.5vh;margin-top:-50vh"></textarea>
+                </div>
+                <div class="col-md-8 col-lg-8 col-sm-8 col-xs-8 nopadormar" style="min-height:3vh; min-width:40vh;">
+                  <input type="text" class="form-control" placeholder="Enter Message" id="messageText" style="font-size:2vh; margin-top:1vh; margin-bottom:1vh; margin-left:2vh; border-radius:6vh; min-height:4vh;"  autofocus/>
+                </div>
+                <div class="col-md-1 col-lg-1 col-sm-1 col-xs-1 nopadormar"></div>
+                <div class="col-md-3 col-lg-3 col-sm-3 col-xs-3 nopadormar" style="border-radius:5vh; min-height:2vh; min-width:15vh;">
+                  <span class="input-group-btn">
+                    <button class="btn btn-success" type="button" id="sendMessage" style="margin-top:1vh; margin-bottom:1vh; border-radius:4vh; min-height:4vh; width:13vh;"><span style="font-size:2vh;">SEND</span><span class="glyphicon glyphicon-send " style="font-size:2vh;min-height:2vh; min-width:4vh;" ></span></button>
+                    <button class="btn btn-success" type="button" id="submitMessage" style="margin-top:1vh; margin-bottom:1vh; border-radius:4vh; min-height:4vh; width:13vh; display: none;"><span style="font-size:2vh;">SUBMIT</span><span class="glyphicon glyphicon-send " style="font-size:2vh;min-height:2vh; min-width:4vh;" ></span></button>
+                  </span>
+                </div>
+
+              </div>
+            </span>
+
+    </div>
+  </div>
+
+</div>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+## Date: 2018-11-20
+## Time: 10:58:30.023443
+
+===============================
+Intent Name:--  Capital-BD
+===============================
+
+
+# Training Phrases # 
+===============================
+
+
+1.  What is the capital of Bangladesh?
+
+2.  Tell me the capital of Bangladesh?
+
+
+
+# BOT Responses # 
+===============================
+
+
+1.  Dhaka
+
+2.  The capital of Bangladesh is Dhaka
+
+## Date: 2018-11-20
+## Time: 16:45:48.604572
+
+===============================
+Intent Name:--  Capital-BD
+===============================
+
+
+# Training Phrases # 
+===============================
+
+
+1.  what is the capital of bangladesh
+
+
+
+# BOT Responses # 
+===============================
+
+
+1.  Dhaka
+

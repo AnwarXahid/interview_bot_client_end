@@ -1,0 +1,11 @@
+.idea/
+*~.pyc
+__pycache__
+virtual/
+virtual_env/
+venv/
+.idea/*
+virtdevn/
+transcripts/
+Fail/
+

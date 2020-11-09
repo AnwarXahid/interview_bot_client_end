@@ -1,0 +1,124 @@
+/*css reset code start*/
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+/*css reset code end*/
+
+/*start of custom styling*/
+.login-admin{
+    /*background-color:#1c355e;*/
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    background-image: url(admin_background.jpg);
+}
+.login-admin .panel{
+    /*margin-top: 10vh;*/
+    border-radius: 0; !important;
+    border: none !important;
+    padding: 0 !important;
+}
+.login-admin .panel-heading{
+    padding: 0; !important;
+    border: none !important;
+}
+.login-admin .imglogo {
+    max-height: 85%;
+    width: 100%;
+    margin-bottom: 2%;
+}
+.login-admin .panel-footer{
+    min-height: 2vh;
+    margin-top: 5px;
+    /*padding-top:2vh;*/
+    /*padding-bottom:0;*/
+    /*margin-bottom:0;*/
+    font-family:Courier;
+    font-size:2vh; color:#820402;
+    background-color:#e8e9ed;
+}
+.login-admin .panel-footer .powerdby{
+    height: 2vh;
+    width: 10vh;
+    font-weight: 200;
+    /*margin-bottom: 10px;*/
+}
+.login-admin .panel-footer p strong{
+    margin-right: 5px;
+}
+/*.login-admin .panel-body{*/
+/*max-height: 65vh;*/
+/*}*/
+.admin-profile-img{
+    padding: 10px;
+    /*max-height: 120px;*/
+    max-width: 135px;
+}
+.login-admin .panel .form-group{
+    margin-bottom: 0;
+    margin-top: 5px;
+}
+.welcome-admin .row{
+    margin: 15px !important;
+}
+#admin-login-height .panel-body{
+    min-height: 60vh; !important;
+}
+#admin-login-height .panel{
+    margin-top: 2vh;
+    max-width: 62vh; !important;
+}
+/*admin activities page height*/
+#admin-activities-height .panel-body{
+    min-height: 60vh; !important;
+}
+#admin-activities-height .panel{
+    margin-top: 2vh;
+    max-width: 62vh; !important;
+}
